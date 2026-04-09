@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { randomUUID } from "crypto";
+
+export const runtime = "edge";
 
 function getAdminClient() {
   return createClient(
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
   }
 
   const ext = filename.split(".").pop() ?? "bin";
-  const storagePath = `${randomUUID()}.${ext}`;
+  const storagePath = `${crypto.randomUUID()}.${ext}`;
 
   const supabase = getAdminClient();
 

@@ -1,4 +1,6 @@
-import { notFound } from "next/navigation";
+export const runtime = "edge";
+
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -81,6 +83,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ListingDetailPage({ params }: Props) {
   const { id } = await params;
+
+  // Auth gate
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseAnonKey) {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+        },
+      },
+    });
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) redirect(`/login?next=/listings/${id}`);
+  }
+
   const listing = await getListing(id);
   if (!listing) notFound();
 

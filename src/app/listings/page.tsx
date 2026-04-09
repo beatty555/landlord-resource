@@ -1,5 +1,8 @@
+export const runtime = "edge";
+
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { MapPin, Bed, TrendingUp, ArrowRight } from "lucide-react";
@@ -69,6 +72,23 @@ function belowMarket(listing: SupabaseListing): number | null {
 }
 
 export default async function ListingsPage() {
+  // Auth gate — redirect unauthenticated users to login
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseAnonKey) {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+        },
+      },
+    });
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) redirect("/login?next=/listings");
+  }
+
   const listings = await getListings();
 
   return (
