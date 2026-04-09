@@ -7,10 +7,12 @@ import { useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 
 function getSupabase() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error("Supabase not configured — NEXT_PUBLIC env vars missing from client bundle");
+  }
+  return createBrowserClient(url, key);
 }
 
 type Tab = "login" | "signup" | "reset";
@@ -40,14 +42,19 @@ function LoginForm() {
     setStatus("loading");
     setErrorMsg("");
 
-    const supabase = getSupabase();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
-      setErrorMsg(error.message);
+      if (error) {
+        setErrorMsg(error.message);
+        setStatus("error");
+      } else {
+        window.location.href = next;
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Login failed");
       setStatus("error");
-    } else {
-      window.location.href = next;
     }
   };
 
@@ -68,18 +75,27 @@ function LoginForm() {
       return;
     }
 
-    const supabase = getSupabase();
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${next}` },
-    });
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${next}` },
+      });
 
-    if (error) {
-      setErrorMsg(error.message);
+      if (error) {
+        setErrorMsg(error.message);
+        setStatus("error");
+      } else if (data.session) {
+        // Email confirmation disabled — user is logged in immediately
+        window.location.href = next;
+      } else {
+        // Email confirmation enabled — show check-your-email message
+        setStatus("success");
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Signup failed");
       setStatus("error");
-    } else {
-      setStatus("success");
     }
   };
 
@@ -88,16 +104,21 @@ function LoginForm() {
     setStatus("loading");
     setErrorMsg("");
 
-    const supabase = getSupabase();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-    });
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+      });
 
-    if (error) {
-      setErrorMsg(error.message);
+      if (error) {
+        setErrorMsg(error.message);
+        setStatus("error");
+      } else {
+        setStatus("success");
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Reset failed");
       setStatus("error");
-    } else {
-      setStatus("success");
     }
   };
 
