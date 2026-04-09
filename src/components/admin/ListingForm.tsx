@@ -262,7 +262,6 @@ export default function ListingForm({ listing, onSuccess, onCancel }: Props) {
     onDrop: handleDrop("floorplan"),
   });
   const documentDz = useDropzone({
-    accept: { "application/pdf": [], "application/msword": [], "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [] },
     onDrop: handleDrop("document"),
   });
 

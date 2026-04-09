@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, CheckCircle, Loader2, AlertTriangle } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Edit, Trash2, CheckCircle, Loader2, AlertTriangle, Upload } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 import { articles } from "@/lib/data/articles";
 import ListingForm, { type SupabaseListing } from "@/components/admin/ListingForm";
 
@@ -9,10 +10,13 @@ type AdminTab = "listings" | "add-listing" | "articles" | "add-article" | "newsl
 
 // ── Article form ─────────────────────────────────────────────
 const emptyArticle = {
+  id: "",
   slug: "",
+  metaTitle: "",
   title: "",
   excerpt: "",
   author: "jack",
+  datePublished: new Date().toISOString().split("T")[0],
   category: "guides",
   subcategory: "tax-finance",
   featuredImage: "",
@@ -38,9 +42,42 @@ export default function AdminPanel() {
 
   // ── Article state ─────────────────────────────────────────
   const [article, setArticle] = useState({ ...emptyArticle });
+  const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
   const [articleSubmitted, setArticleSubmitted] = useState(false);
   const [generatedArticle, setGeneratedArticle] = useState("");
   const [copied, setCopied] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const onImageDrop = useCallback(async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+    setImageUploading(true);
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          bucket: "listing-images",
+        }),
+      });
+      if (!res.ok) throw new Error("Upload URL failed");
+      const { signedUrl, publicUrl } = await res.json();
+      await fetch(signedUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      setArticle((prev) => ({ ...prev, featuredImage: publicUrl }));
+    } catch {
+      alert("Image upload failed");
+    } finally {
+      setImageUploading(false);
+    }
+  }, []);
+
+  const articleImageDz = useDropzone({
+    accept: { "image/*": [] },
+    maxFiles: 1,
+    onDrop: onImageDrop,
+  });
 
   const fetchListings = async () => {
     setListingsLoading(true);
@@ -86,17 +123,19 @@ export default function AdminPanel() {
   // ── Article form ──────────────────────────────────────────
   const handleArticleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const id = String(Date.now());
+    const id = editingArticleId || String(Date.now());
     const slug = article.slug || slugify(article.title);
     const today = new Date().toISOString().split("T")[0];
+    const metaTitle = article.metaTitle || article.title;
 
     const obj = `  {
     id: "${id}",
     slug: "${slug}",
-    title: "${article.title}",
+    title: "${metaTitle}",
+    h1: "${article.title}",
     excerpt: "${article.excerpt.replace(/"/g, '\\"')}",
     author: "${article.author}",
-    datePublished: "${today}",
+    datePublished: "${article.datePublished || today}",
     dateUpdated: "${today}",
     category: "${article.category}",
     subcategory: "${article.subcategory}",
@@ -107,6 +146,26 @@ export default function AdminPanel() {
 
     setGeneratedArticle(obj);
     setArticleSubmitted(true);
+  };
+
+  const handleEditArticle = (a: typeof articles[number]) => {
+    setArticle({
+      id: a.id,
+      slug: a.slug,
+      metaTitle: a.title,
+      title: a.title,
+      excerpt: a.excerpt,
+      author: a.author,
+      datePublished: a.datePublished,
+      category: a.category,
+      subcategory: a.subcategory,
+      featuredImage: a.featuredImage,
+      readTime: String(a.readTime),
+      content: a.content ?? "",
+    });
+    setEditingArticleId(a.id);
+    setArticleSubmitted(false);
+    setTab("add-article");
   };
 
   const copyToClipboard = (text: string) => {
@@ -340,6 +399,7 @@ export default function AdminPanel() {
                     <th className="text-left px-5 py-3">Category</th>
                     <th className="text-left px-5 py-3">Author</th>
                     <th className="text-left px-5 py-3">Published</th>
+                    <th className="px-5 py-3"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -360,6 +420,14 @@ export default function AdminPanel() {
                       <td className="px-5 py-3 text-sm text-gray-500">
                         {new Date(a.datePublished).toLocaleDateString("en-GB")}
                       </td>
+                      <td className="px-5 py-3">
+                        <button
+                          onClick={() => handleEditArticle(a)}
+                          className="flex items-center gap-1 text-xs text-gray-500 hover:text-brand-navy border border-gray-200 px-2.5 py-1.5 rounded-lg transition-colors"
+                        >
+                          <Edit className="h-3.5 w-3.5" /> Edit
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -371,7 +439,9 @@ export default function AdminPanel() {
         {/* ── Add Article ── */}
         {tab === "add-article" && (
           <div className="max-w-3xl">
-            <h2 className="text-xl font-bold text-brand-navy mb-6">Add New Article</h2>
+            <h2 className="text-xl font-bold text-brand-navy mb-6">
+              {editingArticleId ? "Edit Article" : "Add New Article"}
+            </h2>
 
             {articleSubmitted ? (
               <div className="space-y-5">
@@ -400,6 +470,7 @@ export default function AdminPanel() {
                 <button
                   onClick={() => {
                     setArticle({ ...emptyArticle });
+                    setEditingArticleId(null);
                     setArticleSubmitted(false);
                   }}
                   className="bg-brand-green hover:bg-brand-green-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors"
@@ -412,7 +483,28 @@ export default function AdminPanel() {
                 <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Article Title *
+                      Meta Title (Google) *
+                    </label>
+                    <input
+                      required
+                      value={article.metaTitle}
+                      onChange={(e) =>
+                        setArticle({
+                          ...article,
+                          metaTitle: e.target.value,
+                          slug: article.slug || slugify(e.target.value),
+                        })
+                      }
+                      placeholder="e.g. How to Set Up a Limited Company for Buy-to-Let | Landlord Resource"
+                      className={inputCls}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      This appears in search results and browser tabs.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      H1 / Page Title *
                     </label>
                     <input
                       required
@@ -421,12 +513,15 @@ export default function AdminPanel() {
                         setArticle({
                           ...article,
                           title: e.target.value,
-                          slug: slugify(e.target.value),
+                          slug: article.slug || slugify(e.target.value),
                         })
                       }
                       placeholder="e.g. How to Set Up a Limited Company for Buy-to-Let"
                       className={inputCls}
                     />
+                    <p className="text-xs text-gray-400 mt-1">
+                      The main heading shown on the article page.
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">URL Slug</label>
@@ -436,8 +531,7 @@ export default function AdminPanel() {
                       className={`${inputCls} font-mono text-gray-500`}
                     />
                     <p className="text-xs text-gray-400 mt-1">
-                      Auto-generated from title. URL will be: /guides/
-                      {article.slug || "your-slug-here"}
+                      URL will be: /{article.category}/{article.slug || "your-slug-here"}
                     </p>
                   </div>
                   <div>
@@ -467,6 +561,18 @@ export default function AdminPanel() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Date Published *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={article.datePublished}
+                        onChange={(e) => setArticle({ ...article, datePublished: e.target.value })}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Read Time (mins)
                       </label>
                       <input
@@ -487,7 +593,7 @@ export default function AdminPanel() {
                         <option value="legislation">Legislation</option>
                       </select>
                     </div>
-                    <div>
+                    <div className="col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Subcategory
                       </label>
@@ -509,17 +615,60 @@ export default function AdminPanel() {
                       </select>
                     </div>
                   </div>
+
+                  {/* Featured image upload */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Featured Image URL
+                      Featured Image
                     </label>
-                    <input
-                      value={article.featuredImage}
-                      onChange={(e) => setArticle({ ...article, featuredImage: e.target.value })}
-                      placeholder="https://images.unsplash.com/..."
-                      className={inputCls}
-                    />
+                    {article.featuredImage ? (
+                      <div className="relative">
+                        <img
+                          src={article.featuredImage}
+                          alt="Featured"
+                          className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setArticle({ ...article, featuredImage: "" })}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        {...articleImageDz.getRootProps()}
+                        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                          articleImageDz.isDragActive ? "border-brand-green bg-brand-green/5" : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        <input {...articleImageDz.getInputProps()} />
+                        {imageUploading ? (
+                          <div className="flex items-center justify-center gap-2 text-gray-400">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <span className="text-sm">Uploading...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <Upload className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500">
+                              Drag & drop an image or <span className="text-brand-green font-medium">browse</span>
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    <div className="mt-2">
+                      <input
+                        value={article.featuredImage}
+                        onChange={(e) => setArticle({ ...article, featuredImage: e.target.value })}
+                        placeholder="Or paste an image URL..."
+                        className={`${inputCls} text-xs`}
+                      />
+                    </div>
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Article Content
@@ -537,7 +686,7 @@ export default function AdminPanel() {
                   type="submit"
                   className="w-full bg-brand-green hover:bg-brand-green-dark text-white py-3.5 rounded-lg font-semibold transition-colors"
                 >
-                  Generate Article Code
+                  {editingArticleId ? "Update Article Code" : "Generate Article Code"}
                 </button>
               </form>
             )}

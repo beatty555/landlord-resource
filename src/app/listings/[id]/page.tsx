@@ -243,7 +243,32 @@ export default async function ListingDetailPage({ params }: Props) {
 
               {/* Description */}
               <h2 className="font-bold text-brand-navy mb-3">Description</h2>
-              <p className="text-gray-600 leading-relaxed">{listing.description}</p>
+              <div className="text-gray-600 leading-relaxed space-y-2">
+                {(listing.description ?? "").split("\n").map((line, i) => {
+                  const trimmed = line.trim();
+                  if (!trimmed) return <br key={i} />;
+                  // Detect bullet points: lines starting with - or * or •
+                  if (/^[-*•]\s/.test(trimmed)) {
+                    return (
+                      <div key={i} className="flex gap-2">
+                        <span className="text-brand-green font-bold mt-0.5">•</span>
+                        <span>{trimmed.replace(/^[-*•]\s*/, "")}</span>
+                      </div>
+                    );
+                  }
+                  // Detect numbered lists: lines starting with 1. 2. etc
+                  const numMatch = trimmed.match(/^(\d+)[.)]\s*(.*)/);
+                  if (numMatch) {
+                    return (
+                      <div key={i} className="flex gap-2">
+                        <span className="text-brand-navy font-semibold min-w-[1.5rem]">{numMatch[1]}.</span>
+                        <span>{numMatch[2]}</span>
+                      </div>
+                    );
+                  }
+                  return <p key={i}>{trimmed}</p>;
+                })}
+              </div>
             </div>
 
             {/* ── Floorplans ── */}
