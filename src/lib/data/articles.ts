@@ -351,7 +351,7 @@ export const articles: Article[] = [
     readTime: 10,
   },
 
-  // ---- INSURANCE ----
+  // ---- INSURANCE (moved to Legislation / Licensing & Compliance) ----
   {
     id: "24",
     slug: "landlord-insurance",
@@ -360,8 +360,8 @@ export const articles: Article[] = [
     author: "saif",
     datePublished: "2026-04-03",
     dateUpdated: "2026-04-03",
-    category: "guides",
-    subcategory: "insurance",
+    category: "legislation",
+    subcategory: "licensing-compliance",
     featuredImage: IMGS.meeting,
     readTime: 9,
   },
@@ -373,8 +373,8 @@ export const articles: Article[] = [
     author: "jack",
     datePublished: "2026-03-26",
     dateUpdated: "2026-03-26",
-    category: "guides",
-    subcategory: "insurance",
+    category: "legislation",
+    subcategory: "licensing-compliance",
     featuredImage: IMGS.finance,
     readTime: 7,
   },

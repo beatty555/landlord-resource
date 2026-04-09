@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         email,
         options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?next=/dashboard`,
         },
       }),
     });

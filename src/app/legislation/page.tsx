@@ -17,8 +17,19 @@ const subcategories = [
   { key: "eviction-tenancy", label: "Eviction & Tenancy" },
 ];
 
-export default function LegislationPage() {
-  const legislationArticles = articles.filter((a) => a.category === "legislation");
+export default async function LegislationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
+  const activeCategory = category || null;
+
+  const legislationArticles = articles.filter((a) => {
+    if (a.category !== "legislation") return false;
+    if (activeCategory) return a.subcategory === activeCategory;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-brand-cream">
@@ -33,19 +44,35 @@ export default function LegislationPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-wrap gap-2 mb-8">
-          <Link href="/legislation" className="px-4 py-2 rounded-full text-sm font-medium bg-brand-green text-white">
+          <Link
+            href="/legislation"
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              !activeCategory
+                ? "bg-brand-green text-white"
+                : "bg-white border border-gray-200 text-gray-600 hover:border-brand-green hover:text-brand-green"
+            }`}
+          >
             All Legislation
           </Link>
           {subcategories.map((cat) => (
             <Link
               key={cat.key}
               href={`/legislation?category=${cat.key}`}
-              className="px-4 py-2 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-600 hover:border-brand-green hover:text-brand-green transition-colors"
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeCategory === cat.key
+                  ? "bg-brand-green text-white"
+                  : "bg-white border border-gray-200 text-gray-600 hover:border-brand-green hover:text-brand-green"
+              }`}
             >
               {cat.label}
             </Link>
           ))}
         </div>
+
+        <p className="text-sm text-gray-500 mb-6">
+          {legislationArticles.length} article{legislationArticles.length !== 1 ? "s" : ""}
+          {activeCategory ? ` in ${subcategories.find((s) => s.key === activeCategory)?.label}` : ""}
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {legislationArticles.map((article) => (
@@ -61,7 +88,7 @@ export default function LegislationPage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <span className="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-                  Legislation
+                  {subcategories.find((s) => s.key === article.subcategory)?.label ?? "Legislation"}
                 </span>
               </div>
               <div className="p-5">
@@ -93,6 +120,13 @@ export default function LegislationPage() {
             </Link>
           ))}
         </div>
+
+        {legislationArticles.length === 0 && (
+          <div className="text-center py-20 text-gray-400">
+            <p className="text-lg">No articles in this category yet.</p>
+            <p className="text-sm mt-2">Check back soon.</p>
+          </div>
+        )}
       </div>
     </div>
   );

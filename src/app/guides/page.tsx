@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { articles, authors } from "@/lib/data/articles";
@@ -11,13 +11,17 @@ const subcategories = [
   { key: "property-investment", label: "Property Investment" },
   { key: "mortgages", label: "Mortgages" },
   { key: "hmo", label: "HMO" },
-  { key: "insurance", label: "Insurance" },
   { key: "leasehold-freehold", label: "Leasehold & Freehold" },
   { key: "eviction-tenancy", label: "Eviction & Tenancy" },
 ];
 
-export default function GuidesPage() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+export default function GuidesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = use(searchParams);
+  const activeCategory = category || null;
 
   const guideArticles = articles.filter((a) => {
     if (a.category !== "guides") return false;
@@ -39,8 +43,8 @@ export default function GuidesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Category filter pills */}
         <div className="flex flex-wrap gap-2 mb-8">
-          <button
-            onClick={() => setActiveCategory(null)}
+          <Link
+            href="/guides"
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               !activeCategory
                 ? "bg-brand-green text-white"
@@ -48,11 +52,11 @@ export default function GuidesPage() {
             }`}
           >
             All Guides
-          </button>
+          </Link>
           {subcategories.map((cat) => (
-            <button
+            <Link
               key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
+              href={`/guides?category=${cat.key}`}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 activeCategory === cat.key
                   ? "bg-brand-green text-white"
@@ -60,7 +64,7 @@ export default function GuidesPage() {
               }`}
             >
               {cat.label}
-            </button>
+            </Link>
           ))}
         </div>
 

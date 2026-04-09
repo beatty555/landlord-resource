@@ -14,7 +14,6 @@ const navItems = [
       { label: "Property Investment", href: "/guides?category=property-investment" },
       { label: "Mortgages", href: "/guides?category=mortgages" },
       { label: "HMO", href: "/guides?category=hmo" },
-      { label: "Insurance", href: "/guides?category=insurance" },
       { label: "Leasehold & Freehold", href: "/guides?category=leasehold-freehold" },
     ],
   },
