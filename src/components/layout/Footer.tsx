@@ -20,9 +20,9 @@ export default function Footer() {
               Your one-stop hub for landlord guides, legal updates, templates, and property services.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Twitter</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">LinkedIn</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Facebook</a>
+              <a href="https://www.linkedin.com/company/property-buyers-today/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors text-sm">LinkedIn</a>
+              <a href="https://www.facebook.com/p/Property-Buyers-Today-100069799429586/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors text-sm">Facebook</a>
+              <a href="https://www.instagram.com/pbtlincs/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors text-sm">Instagram</a>
             </div>
           </div>
 
