@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     siteName: "Landlord Resource",
     locale: "en_GB",
     type: "website",
+    images: [{ url: "/images/logo.png", width: 1200, height: 630, alt: "Landlord Resource" }],
   },
   robots: {
     index: true,
