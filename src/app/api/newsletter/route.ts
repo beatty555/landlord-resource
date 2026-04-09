@@ -24,21 +24,6 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({ email, tier: "free", subscribed: true }),
       });
 
-      // 2. Send magic link via Supabase Auth
-      await fetch(`${supabaseUrl}/auth/v1/magiclink`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-        },
-        body: JSON.stringify({
-          email,
-          options: {
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
-          },
-        }),
-      });
     }
 
     // 3. Send welcome email via Resend
@@ -62,7 +47,7 @@ export async function POST(req: NextRequest) {
                 Thanks for signing up. You now have free access to all our guides, legislation updates, and downloadable templates.
               </p>
               <p style="color:#555;font-size:16px;line-height:1.6">
-                Check your inbox — we've sent you a magic link to sign in to your account instantly, no password needed.
+                Create a free account at landlordresource.co.uk/login to access investment listings and downloadable templates.
               </p>
               <a href="${process.env.NEXT_PUBLIC_SITE_URL}/guides" style="display:inline-block;background:#4A7C2F;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">
                 Browse Guides

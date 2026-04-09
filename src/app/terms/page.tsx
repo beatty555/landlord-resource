@@ -24,7 +24,7 @@ export default function TermsPage() {
           <h2>Property listings</h2>
           <p>Property listings are provided for informational purposes. We do not act as estate agents. All property transactions should be conducted through qualified professionals. We make no warranties about the accuracy of listing information.</p>
           <h2>Accounts</h2>
-          <p>You are responsible for maintaining the security of your account. You must not share your magic link login emails with others. We reserve the right to suspend accounts that violate these terms.</p>
+          <p>You are responsible for maintaining the security of your account, including your password. We reserve the right to suspend accounts that violate these terms.</p>
           <h2>Intellectual property</h2>
           <p>All content on this site is owned by Landlord Resource unless otherwise stated. You may not reproduce, distribute, or republish any content without our written permission.</p>
           <h2>Limitation of liability</h2>

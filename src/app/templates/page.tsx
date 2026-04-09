@@ -1,11 +1,8 @@
-import type { Metadata } from "next";
-import { FileText, Lock, Download } from "lucide-react";
-import NewsletterSignup from "@/components/ui/NewsletterSignup";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Free Landlord Templates",
-  description: "Download free landlord templates including tenancy agreements, section 21 notices, inventory templates and more.",
-};
+import { useEffect, useState } from "react";
+import { FileText, Lock, Download } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
 
 const templates = [
   {
@@ -57,21 +54,42 @@ const templates = [
 ];
 
 export default function TemplatesPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setIsLoggedIn(false);
+      return;
+    }
+    const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+  }, []);
+
+  const handleDownload = (templateId: string) => {
+    if (!isLoggedIn) {
+      window.location.href = "/login?next=/templates&reason=download";
+      return;
+    }
+    window.location.href = `/templates/${templateId}.pdf`;
+  };
+
   return (
     <div className="min-h-screen bg-brand-cream">
-      {/* Header */}
       <div className="bg-brand-navy py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold text-white mb-3">Free Landlord Templates</h1>
           <p className="text-gray-300 text-lg max-w-2xl">
-            Download ready-to-use templates for tenancy agreements, notices, and more. All templates are free for registered members.
+            Download ready-to-use templates for tenancy agreements, notices, and more. Sign in to download — it&apos;s free.
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Templates list */}
           <div className="lg:col-span-2 space-y-4">
             {templates.map((template) => (
               <div key={template.id} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
@@ -90,7 +108,7 @@ export default function TemplatesPage() {
                       <p className="text-gray-500 text-sm leading-relaxed mb-3">{template.description}</p>
                       {template.warning && (
                         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mb-3">
-                          ⚠️ {template.warning}
+                          {template.warning}
                         </p>
                       )}
                       <div className="flex items-center gap-4 text-xs text-gray-400">
@@ -100,42 +118,46 @@ export default function TemplatesPage() {
                       </div>
                     </div>
                   </div>
-                  <a
-                    href={`/templates/${template.id}.pdf`}
+                  <button
+                    onClick={() => handleDownload(template.id)}
                     className="flex-shrink-0 flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
                   >
                     <Download className="h-4 w-4" />
                     Download
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Sign up prompt */}
-            <div className="bg-white rounded-xl p-6 border border-brand-green/30 shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Lock className="h-5 w-5 text-brand-green" />
-                <h3 className="font-bold text-brand-navy">Free Member Access</h3>
+            {isLoggedIn === false && (
+              <div className="bg-white rounded-xl p-6 border border-brand-green/30 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="h-5 w-5 text-brand-green" />
+                  <h3 className="font-bold text-brand-navy">Free Member Access</h3>
+                </div>
+                <p className="text-sm text-gray-500 mb-4">
+                  Sign in or create a free account to download all templates — no payment required.
+                </p>
+                <a
+                  href="/login?next=/templates"
+                  className="block w-full text-center bg-brand-green hover:bg-brand-green-dark text-white py-3 rounded-lg font-semibold text-sm transition-colors"
+                >
+                  Sign In to Download
+                </a>
               </div>
-              <p className="text-sm text-gray-500 mb-4">
-                All templates are free to download. Sign up as a free member and get instant access — no payment required.
-              </p>
-              <NewsletterSignup label="Enter your email to download" />
-            </div>
+            )}
 
-            {/* What you get */}
             <div className="bg-white rounded-xl p-6 border border-gray-100">
               <h3 className="font-bold text-brand-navy mb-4">Free Membership Includes</h3>
               <ul className="space-y-3">
                 {[
                   "All template downloads",
+                  "Access to all investment listings",
                   "Access to all guides",
                   "Legislation update emails",
                   "Twice weekly newsletter",
-                  "Magic link login — no password",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm text-gray-600">
                     <span className="text-brand-green font-bold">✓</span>

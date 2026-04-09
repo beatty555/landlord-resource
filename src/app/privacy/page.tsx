@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <h2>How we use your data</h2>
           <ul>
             <li>To send you our newsletter and landlord updates (with your consent)</li>
-            <li>To provide magic link authentication to your account</li>
+            <li>To provide authentication and account access</li>
             <li>To respond to enquiries you submit</li>
             <li>To improve our website and content</li>
           </ul>
