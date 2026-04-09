@@ -8,48 +8,48 @@ const templates = [
   {
     id: "ast",
     title: "Assured Shorthold Tenancy Agreement",
-    description: "A comprehensive AST template compliant with current UK law, covering all standard clauses including deposit protection, repair responsibilities, and notice periods.",
+    description: "The official Government Model Tenancy Agreement for assured shorthold tenancies. Comprehensive, regularly updated, and free to download from GOV.UK.",
     category: "Tenancy",
-    pages: 12,
     format: "PDF & Word",
-    updated: "March 2024",
+    externalUrl: "https://www.gov.uk/government/publications/model-agreement-for-a-shorthold-assured-tenancy",
+    badge: "GOV.UK",
   },
   {
     id: "section21",
     title: "Section 21 Notice (Form 6A)",
-    description: "The official Form 6A for serving a Section 21 notice to end a tenancy in England. Includes guidance notes on when and how to serve correctly.",
+    description: "The official prescribed Form 6A for serving a valid Section 21 notice to end an assured shorthold tenancy in England. Download from GOV.UK.",
     category: "Notices",
-    pages: 2,
     format: "PDF",
-    updated: "April 2024",
-    warning: "Important: Section 21 is being abolished. Check current legislation before use.",
+    externalUrl: "https://www.gov.uk/government/publications/form-6a-suitability-for-assured-shorthold-tenancy",
+    badge: "GOV.UK",
+    warning: "Important: Section 21 is being abolished under the Renters Rights Bill. Check current legislation before use.",
   },
   {
     id: "section8",
     title: "Section 8 Notice",
-    description: "Template for serving a Section 8 notice when a tenant has breached the tenancy agreement, including the grounds for possession.",
+    description: "The official notice seeking possession of a property let on an assured tenancy or an assured agricultural occupancy. Download from GOV.UK.",
     category: "Notices",
-    pages: 3,
-    format: "PDF & Word",
-    updated: "March 2024",
+    format: "PDF",
+    externalUrl: "https://www.gov.uk/government/publications/form-3-notice-seeking-possession-of-a-property-let-on-an-assured-tenancy-or-an-assured-agricultural-occupancy",
+    badge: "GOV.UK",
   },
   {
     id: "inventory",
     title: "Property Inventory & Schedule of Condition",
-    description: "A detailed room-by-room inventory template to record the condition of your property at the start and end of a tenancy.",
+    description: "Our own detailed room-by-room inventory template covering living areas, kitchen (with utensils, crockery, cutlery), up to 6 bedrooms, bathrooms, garden and exterior. Print or save as PDF.",
     category: "Admin",
-    pages: 8,
-    format: "PDF & Word",
-    updated: "January 2024",
+    format: "Print / PDF",
+    internalUrl: "/templates/inventory",
+    badge: "Landlord Resource",
   },
   {
     id: "rent-increase",
-    title: "Rent Increase Notice",
-    description: "A formal rent increase notice template for periodic tenancies, compliant with Section 13 of the Housing Act 1988.",
+    title: "Rent Increase Notice (Form 4)",
+    description: "The official Section 13 notice for proposing a new rent under an assured periodic tenancy. Download from GOV.UK.",
     category: "Notices",
-    pages: 1,
-    format: "PDF & Word",
-    updated: "February 2024",
+    format: "PDF",
+    externalUrl: "https://www.gov.uk/government/publications/form-4-landlords-notice-proposing-a-new-rent",
+    badge: "GOV.UK",
   },
 ];
 
@@ -69,12 +69,16 @@ export default function TemplatesPage() {
     });
   }, []);
 
-  const handleDownload = (templateId: string) => {
+  const handleDownload = (template: typeof templates[number]) => {
     if (!isLoggedIn) {
       window.location.href = "/login?next=/templates&reason=download";
       return;
     }
-    window.location.href = `/templates/${templateId}.pdf`;
+    if (template.externalUrl) {
+      window.open(template.externalUrl, "_blank");
+    } else if (template.internalUrl) {
+      window.open(template.internalUrl, "_blank");
+    }
   };
 
   return (
@@ -104,6 +108,13 @@ export default function TemplatesPage() {
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                           {template.category}
                         </span>
+                        {template.badge && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            template.badge === "GOV.UK" ? "bg-blue-50 text-blue-700" : "bg-brand-green/10 text-brand-green"
+                          }`}>
+                            {template.badge}
+                          </span>
+                        )}
                       </div>
                       <p className="text-gray-500 text-sm leading-relaxed mb-3">{template.description}</p>
                       {template.warning && (
@@ -112,13 +123,12 @@ export default function TemplatesPage() {
                         </p>
                       )}
                       <div className="flex items-center gap-4 text-xs text-gray-400">
-                        <span>{template.pages} pages</span>
                         <span>{template.format}</span>
                       </div>
                     </div>
                   </div>
                   <button
-                    onClick={() => handleDownload(template.id)}
+                    onClick={() => handleDownload(template)}
                     className="flex-shrink-0 flex items-center gap-2 bg-brand-green hover:bg-brand-green-dark text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
                   >
                     <Download className="h-4 w-4" />
