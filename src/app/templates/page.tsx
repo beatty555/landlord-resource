@@ -17,17 +17,17 @@ const templates = [
   {
     id: "section21",
     title: "Section 21 Notice (Form 6A)",
-    description: "The official prescribed Form 6A for serving a valid Section 21 notice to end an assured shorthold tenancy in England. Download from GOV.UK.",
+    description: "The official prescribed Form 6A for serving a valid Section 21 notice to end an assured shorthold tenancy in England. Downloads as an editable Word document from GOV.UK.",
     category: "Notices",
     format: "PDF",
-    externalUrl: "https://www.gov.uk/government/publications/form-6a-suitability-for-assured-shorthold-tenancy",
+    externalUrl: "https://assets.publishing.service.gov.uk/media/6155df94e90e07197f18fb61/Form_6A_1_Oct_2021.odt",
     badge: "GOV.UK",
     warning: "Important: Section 21 is being abolished under the Renters Rights Bill. Check current legislation before use.",
   },
   {
     id: "section8",
     title: "Section 8 Notice",
-    description: "The official notice seeking possession of a property let on an assured tenancy or an assured agricultural occupancy. Download from GOV.UK.",
+    description: "The official notice seeking possession of a property let on an assured tenancy or an assured agricultural occupancy. Opens the GOV.UK download page.",
     category: "Notices",
     format: "PDF",
     externalUrl: "https://www.gov.uk/government/publications/form-3-notice-seeking-possession-of-a-property-let-on-an-assured-tenancy-or-an-assured-agricultural-occupancy",
@@ -45,10 +45,10 @@ const templates = [
   {
     id: "rent-increase",
     title: "Rent Increase Notice (Form 4)",
-    description: "The official Section 13 notice for proposing a new rent under an assured periodic tenancy. Download from GOV.UK.",
+    description: "Form 4A — the official landlord's notice proposing a new rent for assured tenancies in the private rented sector. Downloads as PDF from GOV.UK. Note: this is a specimen copy with a watermark — the fillable version is available on the GOV.UK page.",
     category: "Notices",
     format: "PDF",
-    externalUrl: "https://www.gov.uk/government/publications/form-4-landlords-notice-proposing-a-new-rent",
+    externalUrl: "https://assets.publishing.service.gov.uk/media/69b190f495b74651603496b7/Form_4A.pdf",
     badge: "GOV.UK",
   },
 ];
