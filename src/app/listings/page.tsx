@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { MapPin, Bed, TrendingUp, ArrowRight, Lock } from "lucide-react";
@@ -29,23 +30,13 @@ const FREE_PREVIEW_COUNT = 3;
 
 async function getListings(): Promise<SupabaseListing[]> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) return [];
+  // Use service role key to bypass RLS — this runs server-side only,
+  // so unauthenticated visitors can see the public preview listings
+  if (!supabaseUrl || !serviceKey) return [];
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options);
-        });
-      },
-    },
-  });
+  const supabase = createClient(supabaseUrl, serviceKey);
 
   const { data, error } = await supabase
     .from("listings")
@@ -200,7 +191,15 @@ export default async function ListingsPage() {
         {listings.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-xl border border-gray-100">
             <p className="text-gray-400 text-lg mb-2">No listings available right now.</p>
-            <p className="text-sm text-gray-400">Check back soon — we add new deals regularly.</p>
+            <p className="text-sm text-gray-400 mb-6">Check back soon — we add new deals regularly.</p>
+            {!isLoggedIn && (
+              <Link
+                href="/login?next=/listings"
+                className="inline-block bg-brand-green hover:bg-brand-green-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              >
+                Sign Up Free to Get Notified
+              </Link>
+            )}
           </div>
         ) : (
           <>
