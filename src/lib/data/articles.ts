@@ -20,11 +20,13 @@ export const authors = {
   jack: {
     name: "Jack Malnick",
     photo: "/images/authors/jack.png",
-    bio: "Jack is a property investor and landlord with over 10 years of experience in the UK buy-to-let market.",
+    shortBio: "Proptech leader with 20 years experience.",
+    bio: "Managing Director of Sell House Fast and former COO at Sold.co.uk, Jack is a property industry veteran with 20+ years across sales, operations and PropTech. He\u2019s been featured in the Express, IFA Magazine and The Negotiator.",
   },
   saif: {
     name: "Saif Derzi",
     photo: "/images/authors/saif.png",
+    shortBio: "Property expert and investor since 2015.",
     bio: "Founder of Property Buyers Today and SDGB Properties, Saif is a property expert featured in The Times and a sought-after speaker at major property events. Since 2015 he has helped hundreds of landlords and homeowners with quick, transparent property transactions.",
   },
 };

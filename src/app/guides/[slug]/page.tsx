@@ -34,6 +34,9 @@ export default async function GuideArticlePage({ params }: Props) {
 
   const author = authors[article.author];
   const related = getLatestArticles(3).filter((a) => a.slug !== slug);
+  const wasUpdated = article.dateUpdated !== article.datePublished;
+  const displayDate = wasUpdated ? article.dateUpdated : article.datePublished;
+  const dateLabel = wasUpdated ? "Updated" : "Published";
 
   return (
     <div className="min-h-screen bg-brand-cream">
@@ -59,7 +62,7 @@ export default async function GuideArticlePage({ params }: Props) {
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
-                    {new Date(article.datePublished).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                    {dateLabel} {new Date(displayDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
@@ -71,18 +74,18 @@ export default async function GuideArticlePage({ params }: Props) {
                   {article.title}
                 </h1>
 
-                {/* Author */}
+                {/* Author — compact */}
                 <div className="flex items-center gap-3 pb-6 mb-6 border-b border-gray-100">
                   <Image
                     src={author.photo}
                     alt={author.name}
-                    width={48}
-                    height={48}
+                    width={44}
+                    height={44}
                     className="rounded-full object-cover"
                   />
                   <div>
                     <p className="font-semibold text-brand-navy text-sm">{author.name}</p>
-                    <p className="text-xs text-gray-500">{author.bio}</p>
+                    <p className="text-xs text-gray-500">{author.shortBio}</p>
                   </div>
                 </div>
 
@@ -95,7 +98,7 @@ export default async function GuideArticlePage({ params }: Props) {
                   {/* Expert quote block */}
                   <blockquote className="not-prose border-l-4 border-brand-green bg-brand-green/5 px-6 py-4 my-8 rounded-r-lg">
                     <p className="text-brand-navy font-medium italic text-lg leading-relaxed">
-                      "Staying on top of landlord legislation is not optional — it's essential for protecting your investment and your tenants."
+                      &ldquo;Staying on top of landlord legislation is not optional — it&apos;s essential for protecting your investment and your tenants.&rdquo;
                     </p>
                     <footer className="mt-3 text-sm text-gray-500">— {author.name}</footer>
                   </blockquote>
@@ -105,17 +108,29 @@ export default async function GuideArticlePage({ params }: Props) {
                   </p>
                 </div>
 
-                {/* Last updated */}
-                <p className="text-xs text-gray-400 mt-8 pt-6 border-t border-gray-100">
-                  Last updated: {new Date(article.dateUpdated).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
-                </p>
+                {/* Author bio card */}
+                <div className="mt-10 pt-8 border-t border-gray-100">
+                  <div className="flex gap-5 bg-gray-50 rounded-xl p-6">
+                    <Image
+                      src={author.photo}
+                      alt={author.name}
+                      width={80}
+                      height={80}
+                      className="rounded-full object-cover flex-shrink-0 h-20 w-20"
+                    />
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">About the author</p>
+                      <p className="font-bold text-brand-navy text-lg">{author.name}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed mt-2">{author.bio}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </article>
 
           {/* Sidebar */}
           <aside className="space-y-6">
-            {/* Newsletter */}
             <div className="bg-white rounded-xl p-6 border border-gray-100">
               <h3 className="font-bold text-brand-navy mb-2">Stay Informed</h3>
               <p className="text-sm text-gray-500 mb-4">
@@ -124,12 +139,10 @@ export default async function GuideArticlePage({ params }: Props) {
               <NewsletterSignup />
             </div>
 
-            {/* Ad slot — sidebar */}
             <div className="bg-gray-100 rounded-xl h-64 flex items-center justify-center text-gray-400 text-sm" id="ad-slot-article-sidebar">
               Ad Space
             </div>
 
-            {/* Related articles */}
             <div className="bg-white rounded-xl p-6 border border-gray-100">
               <h3 className="font-bold text-brand-navy mb-4">Related Articles</h3>
               <div className="space-y-4">

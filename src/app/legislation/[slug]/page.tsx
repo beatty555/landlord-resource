@@ -30,6 +30,9 @@ export default async function LegislationArticlePage({ params }: Props) {
 
   const author = authors[article.author];
   const related = getLatestArticles(3).filter((a) => a.slug !== slug);
+  const wasUpdated = article.dateUpdated !== article.datePublished;
+  const displayDate = wasUpdated ? article.dateUpdated : article.datePublished;
+  const dateLabel = wasUpdated ? "Updated" : "Published";
 
   return (
     <div className="min-h-screen bg-brand-cream">
@@ -46,17 +49,21 @@ export default async function LegislationArticlePage({ params }: Props) {
               <div className="p-8">
                 <div className="flex items-center gap-3 text-xs text-gray-400 mb-4">
                   <span className="bg-amber-100 text-amber-700 font-semibold px-2.5 py-1 rounded-full">Legislation</span>
-                  <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{new Date(article.datePublished).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {dateLabel} {new Date(displayDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                  </span>
                   <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{article.readTime} min read</span>
                 </div>
 
                 <h1 className="text-3xl font-bold text-brand-navy mb-5 leading-tight">{article.title}</h1>
 
+                {/* Author — compact */}
                 <div className="flex items-center gap-3 pb-6 mb-6 border-b border-gray-100">
-                  <Image src={author.photo} alt={author.name} width={48} height={48} className="rounded-full object-cover" />
+                  <Image src={author.photo} alt={author.name} width={44} height={44} className="rounded-full object-cover" />
                   <div>
                     <p className="font-semibold text-brand-navy text-sm">{author.name}</p>
-                    <p className="text-xs text-gray-500">{author.bio}</p>
+                    <p className="text-xs text-gray-500">{author.shortBio}</p>
                   </div>
                 </div>
 
@@ -73,7 +80,7 @@ export default async function LegislationArticlePage({ params }: Props) {
 
                   <blockquote className="not-prose border-l-4 border-amber-400 bg-amber-50 px-6 py-4 my-8 rounded-r-lg">
                     <p className="text-brand-navy font-medium italic text-lg leading-relaxed">
-                      "Understanding your legal obligations as a landlord is the foundation of a sustainable property portfolio."
+                      &ldquo;Understanding your legal obligations as a landlord is the foundation of a sustainable property portfolio.&rdquo;
                     </p>
                     <footer className="mt-3 text-sm text-gray-500">— {author.name}</footer>
                   </blockquote>
@@ -83,9 +90,23 @@ export default async function LegislationArticlePage({ params }: Props) {
                   </p>
                 </div>
 
-                <p className="text-xs text-gray-400 mt-8 pt-6 border-t border-gray-100">
-                  Last updated: {new Date(article.dateUpdated).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
-                </p>
+                {/* Author bio card */}
+                <div className="mt-10 pt-8 border-t border-gray-100">
+                  <div className="flex gap-5 bg-gray-50 rounded-xl p-6">
+                    <Image
+                      src={author.photo}
+                      alt={author.name}
+                      width={80}
+                      height={80}
+                      className="rounded-full object-cover flex-shrink-0 h-20 w-20"
+                    />
+                    <div>
+                      <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">About the author</p>
+                      <p className="font-bold text-brand-navy text-lg">{author.name}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed mt-2">{author.bio}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </article>
