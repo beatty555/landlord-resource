@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Bed, MapPin, MessageCircle, Download, FileText } from "lucide-react";
@@ -35,6 +36,7 @@ interface SupabaseListing {
   listing_files: {
     id: string;
     file_url: string;
+    storage_path: string;
     file_name: string;
     file_type: string;
     display_order: number;
@@ -63,7 +65,7 @@ async function getListing(id: string): Promise<SupabaseListing | null> {
 
   const { data, error } = await supabase
     .from("listings")
-    .select("*, listing_files(id, file_url, file_name, file_type, display_order)")
+    .select("*, listing_files(id, file_url, storage_path, file_name, file_type, display_order)")
     .eq("id", id)
     .single();
 
@@ -105,18 +107,45 @@ export default async function ListingDetailPage({ params }: Props) {
   if (!listing) notFound();
 
   const files = listing.listing_files ?? [];
+
+  // Images use the public bucket — no signed URL needed
   const images = files
     .filter((f) => f.file_type === "image")
     .sort((a, b) => a.display_order - b.display_order)
     .map((f) => ({ url: f.file_url, name: f.file_name }));
 
-  const floorplans = files
+  // Floorplans and documents use private buckets — generate signed URLs (1 hour expiry)
+  const adminUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const admin = adminUrl && serviceKey ? createClient(adminUrl, serviceKey) : null;
+
+  async function getSignedUrl(bucket: string, storagePath: string): Promise<string> {
+    if (!admin || !storagePath) return "";
+    const { data } = await admin.storage.from(bucket).createSignedUrl(storagePath, 3600);
+    return data?.signedUrl ?? "";
+  }
+
+  const rawFloorplans = files
     .filter((f) => f.file_type === "floorplan")
     .sort((a, b) => a.display_order - b.display_order);
 
-  const documents = files
+  const floorplans = await Promise.all(
+    rawFloorplans.map(async (f) => ({
+      ...f,
+      file_url: await getSignedUrl("listing-floorplans", f.storage_path),
+    }))
+  );
+
+  const rawDocuments = files
     .filter((f) => f.file_type === "document")
     .sort((a, b) => a.display_order - b.display_order);
+
+  const documents = await Promise.all(
+    rawDocuments.map(async (f) => ({
+      ...f,
+      file_url: await getSignedUrl("listing-documents", f.storage_path),
+    }))
+  );
 
   const belowMarket =
     listing.price && listing.open_market_value && listing.open_market_value > 0
