@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, User } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
 
 const navItems = [
   {
@@ -43,6 +44,17 @@ const navItems = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return;
+    const supabase = createBrowserClient(url, key);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
@@ -96,12 +108,22 @@ export default function Header() {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm text-gray-600 hover:text-brand-navy font-medium"
-            >
-              Login
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 text-sm text-brand-navy font-medium hover:text-brand-green transition-colors"
+              >
+                <User className="h-4 w-4" />
+                My Account
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="text-sm text-gray-600 hover:text-brand-navy font-medium"
+              >
+                Login
+              </Link>
+            )}
             <Link
               href="/listings"
               className="bg-brand-green hover:bg-brand-green-dark text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
@@ -150,11 +172,11 @@ export default function Header() {
           ))}
           <div className="pt-3 border-t border-gray-100 space-y-2">
             <Link
-              href="/login"
+              href={isLoggedIn ? "/dashboard" : "/login"}
               className="block py-2 text-gray-600 font-medium"
               onClick={() => setMobileOpen(false)}
             >
-              Login
+              {isLoggedIn ? "My Account" : "Login"}
             </Link>
             <Link
               href="/listings"

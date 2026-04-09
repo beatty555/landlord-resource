@@ -60,7 +60,7 @@ export default async function LegislationArticlePage({ params }: Props) {
 
                 {/* Author — compact */}
                 <div className="flex items-center gap-3 pb-6 mb-6 border-b border-gray-100">
-                  <Image src={author.photo} alt={author.name} width={44} height={44} className="rounded-full object-cover" />
+                  <Image src={author.photo} alt={author.name} width={44} height={44} className="rounded-full object-cover object-top" />
                   <div>
                     <p className="font-semibold text-brand-navy text-sm">{author.name}</p>
                     <p className="text-xs text-gray-500">{author.shortBio}</p>
@@ -98,7 +98,7 @@ export default async function LegislationArticlePage({ params }: Props) {
                       alt={author.name}
                       width={80}
                       height={80}
-                      className="rounded-full object-cover flex-shrink-0 h-20 w-20"
+                      className="rounded-full object-cover object-top flex-shrink-0 h-20 w-20"
                     />
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">About the author</p>

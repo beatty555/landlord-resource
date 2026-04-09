@@ -81,7 +81,7 @@ export default async function GuideArticlePage({ params }: Props) {
                     alt={author.name}
                     width={44}
                     height={44}
-                    className="rounded-full object-cover"
+                    className="rounded-full object-cover object-top"
                   />
                   <div>
                     <p className="font-semibold text-brand-navy text-sm">{author.name}</p>
@@ -116,7 +116,7 @@ export default async function GuideArticlePage({ params }: Props) {
                       alt={author.name}
                       width={80}
                       height={80}
-                      className="rounded-full object-cover flex-shrink-0 h-20 w-20"
+                      className="rounded-full object-cover object-top flex-shrink-0 h-20 w-20"
                     />
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">About the author</p>

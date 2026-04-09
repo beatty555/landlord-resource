@@ -114,7 +114,6 @@ export default function TemplatesPage() {
                       <div className="flex items-center gap-4 text-xs text-gray-400">
                         <span>{template.pages} pages</span>
                         <span>{template.format}</span>
-                        <span>Updated {template.updated}</span>
                       </div>
                     </div>
                   </div>

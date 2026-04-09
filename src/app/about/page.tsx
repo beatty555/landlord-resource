@@ -195,7 +195,7 @@ export default function AboutPage() {
                       alt={author.name}
                       width={96}
                       height={96}
-                      className="rounded-full object-cover flex-shrink-0 h-24 w-24"
+                      className="rounded-full object-cover object-top flex-shrink-0 h-24 w-24"
                     />
                     <div>
                       <h3 className="font-bold text-brand-navy text-xl">{author.name}</h3>
