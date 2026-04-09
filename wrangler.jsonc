@@ -9,6 +9,9 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "assets": {
+    "directory": ".open-next/assets"
+  },
   "vars": {
     "NEXT_PUBLIC_SUPABASE_URL": "https://mlbbufmpvuhdwlrzdabe.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1sYmJ1Zm1wdnVoZHdscnpkYWJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MjQ3MzIsImV4cCI6MjA5MTMwMDczMn0.WN62XpV8kyj-8bHuEG3GEcYfyxucePW33_CicuPsz-0",
