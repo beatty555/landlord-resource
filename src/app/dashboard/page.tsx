@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { FileText, Home, BookOpen, ArrowRight, Shield } from "lucide-react";
+import SignOutButton from "@/components/auth/SignOutButton";
 
 export const metadata: Metadata = {
   title: "Member Dashboard",
@@ -39,9 +40,12 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-brand-cream">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-brand-navy">Welcome back</h1>
-          <p className="text-gray-500 mt-1">Signed in as {userEmail}</p>
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-brand-navy">Welcome back</h1>
+            <p className="text-gray-500 mt-1">Signed in as {userEmail}</p>
+          </div>
+          <SignOutButton />
         </div>
 
         {/* Membership info */}
