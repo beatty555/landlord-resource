@@ -78,6 +78,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 mt-10 pt-6 text-center text-gray-500 text-sm">
           © {new Date().getFullYear()} Landlord Resource. All rights reserved. landlordresource.co.uk
+          <span className="block mt-2 text-gray-600 text-xs">Built by <a href="https://mediaseeds.co.uk/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors">Media Seeds Ltd</a></span>
         </div>
       </div>
     </footer>
