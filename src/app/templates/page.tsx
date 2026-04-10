@@ -27,10 +27,10 @@ const templates = [
   {
     id: "section8",
     title: "Section 8 Notice",
-    description: "The official notice seeking possession of a property let on an assured tenancy or an assured agricultural occupancy. Opens the GOV.UK download page.",
+    description: "The official Form 3 notice seeking possession of a property let on an assured tenancy. Downloads as an editable Word document from GOV.UK.",
     category: "Notices",
     format: "PDF",
-    externalUrl: "https://www.gov.uk/government/publications/form-3-notice-seeking-possession-of-a-property-let-on-an-assured-tenancy-or-an-assured-agricultural-occupancy",
+    externalUrl: "https://assets.publishing.service.gov.uk/media/6155e03d8fa8f5297b643e32/Form_3_1_Oct_2021.odt",
     badge: "GOV.UK",
   },
   {
@@ -45,10 +45,10 @@ const templates = [
   {
     id: "rent-increase",
     title: "Rent Increase Notice (Form 4)",
-    description: "Form 4A — the official landlord's notice proposing a new rent for assured tenancies in the private rented sector. Downloads as PDF from GOV.UK. Note: this is a specimen copy with a watermark — the fillable version is available on the GOV.UK page.",
+    description: "Form 4 — the official landlord's notice proposing a new rent for assured periodic tenancies. Downloads as an editable Word document from GOV.UK.",
     category: "Notices",
     format: "PDF",
-    externalUrl: "https://assets.publishing.service.gov.uk/media/69b190f495b74651603496b7/Form_4A.pdf",
+    externalUrl: "https://assets.publishing.service.gov.uk/media/5a8083aded915d74e622ee55/Form_4_-_Eng.docx",
     badge: "GOV.UK",
   },
 ];
